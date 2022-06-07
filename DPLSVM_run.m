@@ -1,6 +1,6 @@
 %% load data
-load('HCP_test1.mat')
-% Omega : input network for subjects
+load('DATA.mat')
+% Omega : input network information for subjects
 % scov  : input supplementary covariates for subjects
 % Ylabel: input label for subjects
 
@@ -14,6 +14,6 @@ load('HCP_test1.mat')
 % beta_store: saved beta after burnin 
 
 %% save result
-name1 = strcat('HCPd01.mat');
+name1 = strcat('DPLSVM_result.mat');
 
 save(name1,'misc_err_rate','beta_posterior_mean','samp1','beta_store');
