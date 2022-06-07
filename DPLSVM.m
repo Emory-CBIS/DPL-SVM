@@ -1,65 +1,28 @@
-function [misc_err_rate,beta_posterior_mean,samp1,beta_store] = HCP_LR2(Omega,scov,Ylabel)
+function [misc_err_rate,beta_posterior_mean,samp1,beta_store] = DPLSVM(Omega,scov,Ylabel)
 
-%% data input modefication
+%% data input 
 % N : total number of subjects
-% Ntrain: number of subjects in training set (Ntrain = N * 0.8)
-% Ntest: number of subjects in testing set (Ntests = N * 0.2)
-% P : total number of varialbes (number of significant edges + number of
-% covariates)
-% X     : Ntrain * P matrix of input in training set
-% Yi    : Ntrain * 1 matrix of output in training set
-% Xtest1: Ntest * P matrix of input in testing set
-% Ytest : Ntest* * 1 matrix of output in testing set
+% Q : total number of screened edges per subject
+% C : total number of covariates per subject
+% P : total number of varialbes (number of screened edges + number of covariates)
+% Omega : N * Q matrix of network information
+% scov  : N * C matric of covariates 
+% Yi    : N * 1 matrix of label
 N0 = size(Omega,1);
 V1 = size(Omega,2);
 P0 = size(scov,2);
-
-Omevar1 = zeros(V1,V1);
-for i=1:(V1-1)
-    for j=(i+1):V1
-       omgi = squeeze(Omega(:,i,j) );
-       Omevar1(i,j) = var(omgi); 
-    end
-end
-cut1 = 0.1;
-P = sum(sum(Omevar1 > cut1));
-
-Ntest = round(N0*0.2);
-N = N0-Ntest;
-
+P = V1+P0;
+Xall = zeros(N0,P);
+Xall(:,1:V1) = Omega;
+Xall(:,(V1+1):P) = scov;
 samp0 = 1:N0;
 samp1 = sort(randsample(N0,N));
 samp2 = setdiff(samp0,samp1);
+X = Xall(samp0,:);
+Xtest = Xall(samp1,:);
 
-X = zeros(N, P);
-count = 0;
-Xcov = zeros(N,P0);
-for i=1:N
-    count = count +1;
-    j = samp1(i);
-   A = squeeze(Omega(j,:,:)); 
-   M = A(Omevar1>cut1);
-   X(count,:) = M;
-   Xcov(count,:) = scov(j,:);
-end
 
-X(:,end+1:end+P0) = Xcov;
 Yi = Ylabel(samp1);
-
-
-Xtest = zeros(Ntest, P);
-count = 0;
-Xcov1 = zeros(Ntest,P0);
-for i=1:Ntest
-    count = count +1;
-    j = samp2(i);
-   A = squeeze(Omega(j,:,:)); 
-   M = A(Omevar1>cut1);
-   Xtest(count,:) = M;
-   Xcov1(count,:) = scov(j,:);
-end
-
-Xtest(:,end+1:end+P0) = Xcov1;
 Ytest = Ylabel(samp2);
 
 P = size(X,2);
