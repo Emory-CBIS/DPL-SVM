@@ -11,6 +11,8 @@ function [misc_err_rate,beta_posterior_mean,samp1,beta_store] = DPLSVM(Omega,sco
 N0 = size(Omega,1);
 V1 = size(Omega,2);
 P0 = size(scov,2);
+Ntest = round(N*0.2);
+N = N0 - Ntest;
 P = V1+P0;
 Xall = zeros(N0,P);
 Xall(:,1:V1) = Omega;
@@ -18,8 +20,8 @@ Xall(:,(V1+1):P) = scov;
 samp0 = 1:N0;
 samp1 = sort(randsample(N0,N));
 samp2 = setdiff(samp0,samp1);
-X = Xall(samp0,:);
-Xtest = Xall(samp1,:);
+X = Xall(samp1,:);
+Xtest = Xall(samp2,:);
 
 
 Yi = Ylabel(samp1);
